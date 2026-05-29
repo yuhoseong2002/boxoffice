@@ -68,6 +68,9 @@ export default function App() {
   const [aiError, setAiError] = useState<string | null>(null);
   const [copied, setCopied] = useState<boolean>(false);
   
+  // Title truncation state (user toggles long names format)
+  const [truncateLongNames, setTruncateLongNames] = useState<boolean>(true);
+
   // Loading & Error States
   const [isListLoading, setIsListLoading] = useState<boolean>(false);
   const [isDetailLoading, setIsDetailLoading] = useState<boolean>(false);
@@ -424,13 +427,33 @@ export default function App() {
                 박스오피스 <span className="text-amber-500">TOP 10</span> 주요 정보
               </p>
             </div>
-            <span className={`text-[10px] font-mono px-3.5 py-1.5 rounded-full border self-start sm:self-center ${
-              theme === "dark" 
-                ? "bg-neutral-800/80 border-neutral-700 text-neutral-450" 
-                : "bg-white border-neutral-200 text-neutral-600 shadow-sm"
-            }`}>
-              KOBIS Live Stream Connected
-            </span>
+            <div className="flex flex-wrap items-center gap-2.5 self-start sm:self-center">
+              {/* 영화명 생략/전체 표시 토글 버튼 */}
+              <button
+                onClick={() => setTruncateLongNames(!truncateLongNames)}
+                className={`text-[10px] font-bold px-3.5 py-1.5 rounded-full border transition-all cursor-pointer select-none flex items-center gap-1.5 ${
+                  truncateLongNames
+                    ? theme === "dark"
+                      ? "bg-amber-500/10 border-amber-500/30 text-amber-400 hover:bg-amber-500/20"
+                      : "bg-amber-50 border-amber-200 text-amber-700 hover:bg-amber-100 shadow-sm"
+                    : theme === "dark"
+                      ? "bg-neutral-800 border-neutral-700 text-neutral-300 hover:bg-neutral-750"
+                      : "bg-white border-neutral-200 text-neutral-600 hover:bg-neutral-50 shadow-sm"
+                }`}
+                title="긴 영화 제목 말줄임 활성화/비활성화"
+              >
+                <div className={`w-1.5 h-1.5 rounded-full ${truncateLongNames ? "bg-amber-500 animate-pulse" : "bg-neutral-400"}`} />
+                <span>제목 말줄임: {truncateLongNames ? "ON" : "OFF"}</span>
+              </button>
+
+              <span className={`text-[10px] font-mono px-3.5 py-1.5 rounded-full border ${
+                theme === "dark" 
+                  ? "bg-neutral-800/80 border-neutral-700 text-neutral-450" 
+                  : "bg-white border-neutral-200 text-neutral-600 shadow-sm"
+              }`}>
+                KOBIS Live Stream Connected
+              </span>
+            </div>
           </div>
 
           {/* List Loading */}
@@ -495,7 +518,7 @@ export default function App() {
                       isTopRank
                         ? "text-amber-500"
                         : theme === "dark" 
-                          ? "text-neutral-700" 
+                          ? "text-neutral-500" 
                           : "text-neutral-350"
                     }`}>
                       {rankNum}
@@ -507,11 +530,26 @@ export default function App() {
                         {renderRankChangeText(movie.rankInten, movie.rankOldAndNew)}
                       </div>
 
-                      <h4 className="text-sm font-bold truncate leading-snug tracking-tight text-neutral-900 dark:text-neutral-100 group-hover:text-amber-500 transition-colors">
+                      <h4 
+                        title={movie.movieNm} 
+                        className={`text-sm font-bold leading-snug tracking-tight transition-colors ${
+                          truncateLongNames 
+                            ? "truncate block" 
+                            : "whitespace-normal break-words"
+                        } ${
+                          theme === "dark"
+                            ? "text-amber-400 group-hover:text-amber-300"
+                            : "text-neutral-900 group-hover:text-amber-600"
+                        }`}
+                      >
                         {movie.movieNm}
                       </h4>
 
-                      <div className="flex items-center text-[10.5px] font-semibold text-neutral-450 dark:text-neutral-500 mt-1.5 space-x-2.5">
+                      <div className={`flex items-center text-[10.5px] font-semibold mt-1.5 space-x-2.5 transition-colors ${
+                        theme === "dark"
+                          ? "text-neutral-300"
+                          : "text-neutral-500"
+                      }`}>
                         <span>일일 <strong className="text-amber-500 font-mono font-bold">{formatAudienceShort(movie.audiCnt)}</strong></span>
                         <span className="opacity-30">|</span>
                         <span>누적 <strong className="font-mono">{formatAudienceShort(movie.audiAcc)}</strong></span>
